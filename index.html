@@ -87,6 +87,70 @@
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }
 
+        .voice-toggle-btn {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e5e9;
+            cursor: pointer;
+            font-weight: 600;
+            min-width: 120px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .voice-toggle-btn:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .voice-toggle-btn.active {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .voice-toggle-btn.active:hover {
+            background: #218838;
+            border-color: #218838;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: #ccc;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .voice-toggle-btn.active .toggle-switch {
+            background: #fff;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .voice-toggle-btn.active .toggle-slider {
+            transform: translateX(20px);
+            background: #28a745;
+        }
+
+        .toggle-text {
+            font-size: 0.9rem;
+        }
+
         .click-indicator {
             display: inline-block;
             margin-left: 8px;
@@ -514,7 +578,7 @@
         }
 
         .apply-btn {
-            background: #667eea;
+            background: #1e3a8a;
             color: white;
             border: none;
             padding: 12px 20px;
@@ -527,7 +591,7 @@
         }
 
         .apply-btn:hover {
-            background: #5a67d8;
+            background: #1e40af;
             transform: translateY(-1px);
         }
 
@@ -631,6 +695,47 @@
 
         .popup-close:hover {
             background: #5a67d8;
+        }
+
+        .winner-controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .speaker-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speaker-btn:hover {
+            background: linear-gradient(45deg, #218838, #1ea085);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .speaker-btn:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3);
+        }
+
+        .speaker-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         @keyframes fadeIn {
@@ -786,6 +891,15 @@
                 <label>색상테마 (클릭! 나만의 돌림판 색상을 선택하세요!)</label>
                 <button class="color-scheme-btn" id="colorScheme" onclick="toggleColorScheme()">색상 선택</button>
             </div>
+            <div class="control-group">
+                <label>음성 발표 🔊</label>
+                <button class="voice-toggle-btn" id="voiceToggle" onclick="toggleVoiceAnnouncement()">
+                    <span class="toggle-switch">
+                        <span class="toggle-slider"></span>
+                    </span>
+                    <span class="toggle-text">켜짐</span>
+                </button>
+            </div>
         </div>
 
         <div class="main-content">
@@ -865,17 +979,18 @@
                     <div>📁 파일에서 참가자 불러오기</div>
                     <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                         <input type="file" id="fileInput" class="file-input" accept=".txt,.csv" onchange="handleFileUpload(event)">
-                        <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">파일 선택</button>
-                        <button class="file-upload-btn" id="loadPreviousBtn" onclick="loadPreviousSettings()" disabled title="이전 설정이 없습니다">📋 불러오기</button>
+                        <button class="file-upload-btn" onclick="document.getElementById('fileInput').click()">새 참가자</button>
+                        <button class="file-upload-btn" id="loadPreviousBtn" onclick="loadPreviousSettings()" disabled title="이전 설정이 없습니다">📋 이전 참가자</button>
                         <button class="practice-btn" onclick="loadPracticeFile()">📝 연습파일</button>
                         <button class="reset-btn" onclick="resetToDefault()">🔄 기본값으로 되돌리기</button>
                     </div>
+                    <button class="apply-btn" onclick="applyParticipantsToWheel()" style="margin-top: 15px;">🎯 원판에 적용하기</button>
                     <div class="upload-info">
                         지원 형식: 텍스트(.txt), CSV(.csv)<br>
                         각 줄마다 한 명씩 또는 쉼표로 구분하여 작성해주세요<br>
                         <strong>💡 한글 깨짐 방지:</strong> 메모장에서 "다른 이름으로 저장" → 인코딩을 "UTF-8"로 선택하여 저장<br>
-                        <strong>📋 불러오기:</strong> 바로 직전에 적용했던 돌림판 설정을 다시 불러옵니다<br>
-                        <strong>📝 연습파일:</strong> 29명의 샘플 참가자 목록을 불러옵니다
+                        <strong>📋 이전 참가자:</strong> 바로 직전에 적용했던 돌림판 설정을 다시 불러옵니다<br>
+                        <strong>📝 연습파일:</strong> 28명의 샘플 참가자 목록을 불러옵니다
                     </div>
                     <div id="uploadStatus"></div>
                 </div>
@@ -893,6 +1008,11 @@
         <div class="popup-content">
             <div class="popup-title">🎉 당첨자 발표! 🎉</div>
             <div class="popup-winner" id="popupWinner"></div>
+            <div class="winner-controls">
+                <button class="speaker-btn" id="speakerBtn" onclick="speakWinnerNameManually()" title="이름을 소리로 읽어줍니다">
+                    🔊 발음 듣기
+                </button>
+            </div>
             <button class="popup-close" onclick="closePopup()">확인</button>
         </div>
     </div>
@@ -903,6 +1023,7 @@
         let participants = ['참가자1', '참가자2', '참가자3', '참가자4', '참가자5', '참가자6', '참가자7', '참가자8'];
         let previousSettings = null;
         let segmentAngles = []; // 각 구간의 시작 각도를 저장
+        let voiceAnnouncementEnabled = true; // 음성 발표 기능 활성화 여부
 
         const pastelColors = [
             '#FF8A80', '#FFB366', '#FFFFBA', '#BAFFC9', 
@@ -992,6 +1113,27 @@
             }
             
             updateWheel();
+        }
+
+        function toggleVoiceAnnouncement() {
+            voiceAnnouncementEnabled = !voiceAnnouncementEnabled;
+            const btn = document.getElementById('voiceToggle');
+            const toggleText = btn.querySelector('.toggle-text');
+            
+            if (voiceAnnouncementEnabled) {
+                btn.classList.add('active');
+                toggleText.textContent = '켜짐';
+            } else {
+                btn.classList.remove('active');
+                toggleText.textContent = '꺼짐';
+            }
+            
+            // 설정을 로컬 저장소에 저장
+            try {
+                localStorage.setItem('voiceAnnouncementEnabled', voiceAnnouncementEnabled.toString());
+            } catch (error) {
+                console.log('음성 설정 저장 실패:', error);
+            }
         }
 
         function updateWheel() {
@@ -1111,6 +1253,9 @@
             spinBtn.disabled = true;
             spinBtn.textContent = '돌리는 중...';
             
+            // 돌림판 회전 효과음 재생
+            playSpinSound();
+            
             const wheel = document.getElementById('wheel');
             const spinningRings = document.getElementById('spinningRings');
             const segmentCount = participants.length;
@@ -1183,11 +1328,551 @@
             }, 3000);
         }
 
+        let currentWinner = ''; // 현재 당첨자 이름을 저장하는 전역 변수
+
         function showWinner(winner) {
+            currentWinner = winner; // 현재 당첨자 저장
             document.getElementById('popupWinner').textContent = winner;
             document.getElementById('popup').style.display = 'flex';
             createConfetti();
             playWinnerSound();
+            
+            // 음성 발표가 활성화된 경우에만 음성으로 읽기
+            if (voiceAnnouncementEnabled) {
+                setTimeout(() => {
+                    speakWinnerName(winner);
+                }, 1000);
+            }
+        }
+
+        function speakWinnerNameManually() {
+            if (!currentWinner) {
+                console.log('읽을 당첨자 이름이 없습니다.');
+                return;
+            }
+            
+            const speakerBtn = document.getElementById('speakerBtn');
+            speakerBtn.disabled = true;
+            speakerBtn.textContent = '🔊 읽는 중...';
+            
+            try {
+                // Web Speech API 지원 확인
+                if ('speechSynthesis' in window) {
+                    // 이전 음성이 재생 중이면 중지
+                    window.speechSynthesis.cancel();
+                    
+                    // 음성 합성 설정
+                    const utterance = new SpeechSynthesisUtterance();
+                    
+                    // 영어인지 한국어인지 자동 감지
+                    const isEnglish = /^[a-zA-Z\s\-'\.]+$/.test(currentWinner);
+                    
+                    if (isEnglish) {
+                        // 영어 단어/이름인 경우
+                        utterance.lang = 'en-US';
+                        utterance.text = currentWinner;
+                        utterance.rate = 0.8; // 영어는 조금 느리게
+                        utterance.pitch = 1.0;
+                        
+                        // 영어 음성 찾기
+                        const voices = window.speechSynthesis.getVoices();
+                        const englishVoice = voices.find(voice => 
+                            voice.lang.includes('en-US') || 
+                            voice.lang.includes('en-GB') ||
+                            voice.name.includes('English')
+                        );
+                        
+                        if (englishVoice) {
+                            utterance.voice = englishVoice;
+                            console.log('영어 음성 사용:', englishVoice.name);
+                        }
+                    } else {
+                        // 한국어 이름인 경우
+                        utterance.lang = 'ko-KR';
+                        utterance.text = currentWinner;
+                        utterance.rate = 0.9;
+                        utterance.pitch = 1.1;
+                        
+                        // 한국어 음성 찾기
+                        const voices = window.speechSynthesis.getVoices();
+                        const koreanVoice = voices.find(voice => 
+                            voice.lang.includes('ko') || 
+                            voice.name.includes('Korean') ||
+                            voice.name.includes('한국')
+                        );
+                        
+                        if (koreanVoice) {
+                            utterance.voice = koreanVoice;
+                            console.log('한국어 음성 사용:', koreanVoice.name);
+                        }
+                    }
+                    
+                    utterance.volume = 0.9;
+                    
+                    // 음성 이벤트 리스너
+                    utterance.onstart = function() {
+                        console.log('수동 음성 읽기 시작:', currentWinner);
+                    };
+                    
+                    utterance.onend = function() {
+                        console.log('수동 음성 읽기 완료:', currentWinner);
+                        speakerBtn.disabled = false;
+                        speakerBtn.textContent = '🔊 발음 듣기';
+                    };
+                    
+                    utterance.onerror = function(event) {
+                        console.log('수동 음성 읽기 오류:', event.error);
+                        speakerBtn.disabled = false;
+                        speakerBtn.textContent = '🔊 발음 듣기';
+                        alert('음성 재생에 실패했습니다. 브라우저가 음성 기능을 지원하지 않을 수 있습니다.');
+                    };
+                    
+                    // 음성 재생
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.log('이 브라우저는 음성 합성을 지원하지 않습니다.');
+                    speakerBtn.disabled = false;
+                    speakerBtn.textContent = '🔊 발음 듣기';
+                    alert('이 브라우저는 음성 기능을 지원하지 않습니다.');
+                }
+            } catch (error) {
+                console.log('수동 음성 읽기 중 오류 발생:', error);
+                speakerBtn.disabled = false;
+                speakerBtn.textContent = '🔊 발음 듣기';
+                alert('음성 재생 중 오류가 발생했습니다.');
+            }
+        }
+
+        function speakWinnerName(winner) {
+            try {
+                // Web Speech API 지원 확인
+                if ('speechSynthesis' in window) {
+                    // 이전 음성이 재생 중이면 중지
+                    window.speechSynthesis.cancel();
+                    
+                    // 음성 합성 설정
+                    const utterance = new SpeechSynthesisUtterance();
+                    
+                    // 한국어 음성으로 설정
+                    utterance.lang = 'ko-KR';
+                    utterance.text = `당첨자는 ${winner}입니다. 축하합니다!`;
+                    
+                    // 음성 설정
+                    utterance.rate = 0.9; // 말하기 속도 (0.1 ~ 10)
+                    utterance.pitch = 1.1; // 음성 높낮이 (0 ~ 2)
+                    utterance.volume = 0.8; // 볼륨 (0 ~ 1)
+                    
+                    // 한국어 음성 찾기
+                    const voices = window.speechSynthesis.getVoices();
+                    const koreanVoice = voices.find(voice => 
+                        voice.lang.includes('ko') || 
+                        voice.name.includes('Korean') ||
+                        voice.name.includes('한국')
+                    );
+                    
+                    if (koreanVoice) {
+                        utterance.voice = koreanVoice;
+                        console.log('한국어 음성 사용:', koreanVoice.name);
+                    } else {
+                        console.log('한국어 음성을 찾을 수 없어 기본 음성 사용');
+                    }
+                    
+                    // 음성 이벤트 리스너
+                    utterance.onstart = function() {
+                        console.log('음성 읽기 시작:', winner);
+                    };
+                    
+                    utterance.onend = function() {
+                        console.log('음성 읽기 완료:', winner);
+                        // 음성 끝난 후 효과음 재생
+                        setTimeout(() => {
+                            playCelebrationSounds();
+                        }, 300);
+                    };
+                    
+                    utterance.onerror = function(event) {
+                        console.log('음성 읽기 오류:', event.error);
+                        // 오류 발생시에도 효과음은 재생
+                        setTimeout(() => {
+                            playCelebrationSounds();
+                        }, 500);
+                    };
+                    
+                    // 음성 재생
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    console.log('이 브라우저는 음성 합성을 지원하지 않습니다.');
+                    // 음성 지원 안되면 바로 효과음 재생
+                    playCelebrationSounds();
+                }
+            } catch (error) {
+                console.log('음성 읽기 중 오류 발생:', error);
+                // 오류 발생시에도 효과음은 재생
+                playCelebrationSounds();
+            }
+        }
+
+        function playCelebrationSounds() {
+            try {
+                // AudioContext 생성 및 활성화
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // AudioContext가 suspended 상태면 resume
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        console.log('AudioContext 활성화됨');
+                        playAllSounds(audioContext);
+                    });
+                } else {
+                    playAllSounds(audioContext);
+                }
+                
+            } catch (error) {
+                console.log('축하 효과음 재생 실패:', error);
+                // 대체 효과음 (간단한 beep)
+                playFallbackSound();
+            }
+        }
+
+        function playAllSounds(audioContext) {
+            const now = audioContext.currentTime;
+            
+            // 박수소리만 재생 (나팔소리와 환호성 완전 제거)
+            playApplauseSound(audioContext);
+        }
+
+
+
+        function playFireworkSound(audioContext) {
+            try {
+                const now = audioContext.currentTime;
+                
+                // 폭죽이 터지는 "펑!" 소리들
+                const createPop = (delay, frequency) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    const filter = audioContext.createBiquadFilter();
+                    
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    const startTime = now + delay;
+                    osc.frequency.setValueAtTime(frequency, startTime);
+                    osc.frequency.exponentialRampToValueAtTime(frequency * 0.1, startTime + 0.15);
+                    osc.type = 'square';
+                    
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(3000, startTime);
+                    filter.frequency.exponentialRampToValueAtTime(200, startTime + 0.15);
+                    
+                    gain.gain.setValueAtTime(0.4, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.15);
+                };
+                
+                // 여러 개의 폭죽 소리
+                createPop(0, 180);
+                createPop(0.2, 220);
+                createPop(0.4, 160);
+                createPop(0.6, 200);
+                
+                console.log('폭죽 소리 재생됨');
+            } catch (error) {
+                console.log('폭죽 소리 재생 실패:', error);
+            }
+        }
+
+        function playApplauseSound(audioContext) {
+            try {
+                const now = audioContext.currentTime;
+                
+                // 🔊 초강력 박수 소리 생성 (훨씬 더 많고 크고 길게!)
+                for (let i = 0; i < 80; i++) { // 40개에서 80개로 증가
+                    const delay = i * 0.04 + Math.random() * 0.02; // 더 빠른 간격
+                    
+                    setTimeout(() => {
+                        const bufferSize = audioContext.sampleRate * 0.15; // 더 긴 지속시간
+                        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        
+                        // 박수 소리를 위한 초강력 노이즈 생성
+                        for (let j = 0; j < bufferSize; j++) {
+                            data[j] = (Math.random() * 2 - 1) * 1.5; // 볼륨 최대로 증가!
+                        }
+                        
+                        const source = audioContext.createBufferSource();
+                        source.buffer = buffer;
+                        
+                        const filter = audioContext.createBiquadFilter();
+                        filter.type = 'bandpass';
+                        filter.frequency.setValueAtTime(1000 + Math.random() * 2500, audioContext.currentTime);
+                        filter.Q.setValueAtTime(1.5, audioContext.currentTime);
+                        
+                        const gain = audioContext.createGain();
+                        gain.gain.setValueAtTime(1.2, audioContext.currentTime); // 볼륨 최대로!
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+                        
+                        source.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(audioContext.destination);
+                        
+                        source.start(audioContext.currentTime);
+                        source.stop(audioContext.currentTime + 0.15);
+                    }, delay * 1000);
+                }
+                
+                // 추가 박수 레이어 (더 깊고 웅장한 소리)
+                for (let i = 0; i < 60; i++) {
+                    const delay = i * 0.05 + Math.random() * 0.03;
+                    
+                    setTimeout(() => {
+                        const bufferSize = audioContext.sampleRate * 0.12;
+                        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        
+                        // 더 깊은 박수 소리
+                        for (let j = 0; j < bufferSize; j++) {
+                            data[j] = (Math.random() * 2 - 1) * 1.3;
+                        }
+                        
+                        const source = audioContext.createBufferSource();
+                        source.buffer = buffer;
+                        
+                        const filter = audioContext.createBiquadFilter();
+                        filter.type = 'bandpass';
+                        filter.frequency.setValueAtTime(600 + Math.random() * 1500, audioContext.currentTime);
+                        filter.Q.setValueAtTime(1.8, audioContext.currentTime);
+                        
+                        const gain = audioContext.createGain();
+                        gain.gain.setValueAtTime(1.0, audioContext.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
+                        
+                        source.connect(filter);
+                        filter.connect(gain);
+                        gain.connect(audioContext.destination);
+                        
+                        source.start(audioContext.currentTime);
+                        source.stop(audioContext.currentTime + 0.12);
+                    }, delay * 1000);
+                }
+                
+                console.log('🔊 초강력 박수 소리 재생됨! (140개 레이어, 최대 볼륨)');
+            } catch (error) {
+                console.log('박수 소리 재생 실패:', error);
+            }
+        }
+
+        function playCheerSound(audioContext) {
+            try {
+                const now = audioContext.currentTime;
+                
+                // 🔊 초강력 환호성 - "와아아아아!" 소리 (최대한 크게!)
+                
+                // 1번 목소리 - 메인 환호성 (최대 볼륨)
+                const voice1 = audioContext.createOscillator();
+                const gain1 = audioContext.createGain();
+                voice1.connect(gain1);
+                gain1.connect(audioContext.destination);
+                
+                voice1.frequency.setValueAtTime(200, now);
+                voice1.frequency.linearRampToValueAtTime(500, now + 0.3);
+                voice1.frequency.linearRampToValueAtTime(300, now + 1.5);
+                voice1.type = 'sawtooth';
+                
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(2.0, now + 0.05);  // 볼륨 2배로 증가!
+                gain1.gain.linearRampToValueAtTime(1.8, now + 0.8);
+                gain1.gain.linearRampToValueAtTime(1.5, now + 1.2);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                
+                voice1.start(now);
+                voice1.stop(now + 1.5);
+                
+                // 2번 목소리 - 하모니 (최대 볼륨)
+                const voice2 = audioContext.createOscillator();
+                const gain2 = audioContext.createGain();
+                voice2.connect(gain2);
+                gain2.connect(audioContext.destination);
+                
+                voice2.frequency.setValueAtTime(250, now + 0.02);
+                voice2.frequency.linearRampToValueAtTime(600, now + 0.25);
+                voice2.frequency.linearRampToValueAtTime(350, now + 1.4);
+                voice2.type = 'triangle';
+                
+                gain2.gain.setValueAtTime(0, now + 0.02);
+                gain2.gain.linearRampToValueAtTime(1.8, now + 0.07);
+                gain2.gain.linearRampToValueAtTime(1.6, now + 0.8);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.4);
+                
+                voice2.start(now + 0.02);
+                voice2.stop(now + 1.4);
+                
+                // 3번 목소리 - 높은 음역 (최대 볼륨)
+                const voice3 = audioContext.createOscillator();
+                const gain3 = audioContext.createGain();
+                voice3.connect(gain3);
+                gain3.connect(audioContext.destination);
+                
+                voice3.frequency.setValueAtTime(400, now + 0.04);
+                voice3.frequency.linearRampToValueAtTime(700, now + 0.27);
+                voice3.frequency.linearRampToValueAtTime(450, now + 1.3);
+                voice3.type = 'sine';
+                
+                gain3.gain.setValueAtTime(0, now + 0.04);
+                gain3.gain.linearRampToValueAtTime(1.7, now + 0.09);
+                gain3.gain.linearRampToValueAtTime(1.5, now + 0.7);
+                gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+                
+                voice3.start(now + 0.04);
+                voice3.stop(now + 1.3);
+                
+                // 4번 목소리 - 베이스 (최대 볼륨)
+                const voice4 = audioContext.createOscillator();
+                const gain4 = audioContext.createGain();
+                voice4.connect(gain4);
+                gain4.connect(audioContext.destination);
+                
+                voice4.frequency.setValueAtTime(150, now + 0.06);
+                voice4.frequency.linearRampToValueAtTime(350, now + 0.29);
+                voice4.frequency.linearRampToValueAtTime(200, now + 1.2);
+                voice4.type = 'square';
+                
+                gain4.gain.setValueAtTime(0, now + 0.06);
+                gain4.gain.linearRampToValueAtTime(1.6, now + 0.11);
+                gain4.gain.linearRampToValueAtTime(1.4, now + 0.6);
+                gain4.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                
+                voice4.start(now + 0.06);
+                voice4.stop(now + 1.2);
+                
+                // 5번 목소리 - 군중 효과 1 (최대 볼륨)
+                const voice5 = audioContext.createOscillator();
+                const gain5 = audioContext.createGain();
+                voice5.connect(gain5);
+                gain5.connect(audioContext.destination);
+                
+                voice5.frequency.setValueAtTime(300, now + 0.03);
+                voice5.frequency.linearRampToValueAtTime(550, now + 0.26);
+                voice5.frequency.linearRampToValueAtTime(380, now + 1.1);
+                voice5.type = 'sawtooth';
+                
+                gain5.gain.setValueAtTime(0, now + 0.03);
+                gain5.gain.linearRampToValueAtTime(1.5, now + 0.08);
+                gain5.gain.linearRampToValueAtTime(1.3, now + 0.5);
+                gain5.gain.exponentialRampToValueAtTime(0.001, now + 1.1);
+                
+                voice5.start(now + 0.03);
+                voice5.stop(now + 1.1);
+                
+                console.log('🔊 초강력 환호성 재생됨! (5개 목소리 레이어, 최대 볼륨 2.0)');
+            } catch (error) {
+                console.log('환호 소리 재생 실패:', error);
+            }
+        }
+
+        function playFallbackSound() {
+            // 간단한 대체 효과음 (브라우저 호환성을 위해)
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.frequency.setValueAtTime(800, audioContext.currentTime);
+                osc.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.5);
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.5);
+                
+                osc.start(audioContext.currentTime);
+                osc.stop(audioContext.currentTime + 0.5);
+                
+                console.log('대체 효과음 재생됨');
+            } catch (error) {
+                console.log('모든 효과음 재생 실패:', error);
+            }
+        }
+
+        function playSpinSound() {
+            // 돌림판 회전 효과음 생성
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // 회전 소리 생성 (바람 소리 + 기계 소리)
+                const createSpinSound = () => {
+                    // 화이트 노이즈 생성 (바람 소리)
+                    const bufferSize = audioContext.sampleRate * 3; // 3초
+                    const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = (Math.random() * 2 - 1) * 0.1; // 작은 볼륨의 화이트 노이즈
+                    }
+                    
+                    const noiseSource = audioContext.createBufferSource();
+                    noiseSource.buffer = buffer;
+                    
+                    // 필터로 바람 소리 만들기
+                    const filter = audioContext.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.setValueAtTime(800, audioContext.currentTime);
+                    filter.Q.setValueAtTime(2, audioContext.currentTime);
+                    
+                    // 볼륨 조절
+                    const gainNode = audioContext.createGain();
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2.8);
+                    
+                    // 연결
+                    noiseSource.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    noiseSource.start(audioContext.currentTime);
+                    noiseSource.stop(audioContext.currentTime + 3);
+                };
+                
+                // 기계적인 회전 소리 (톱니바퀴 소리)
+                const createMechanicalSound = () => {
+                    const now = audioContext.currentTime;
+                    
+                    // 여러 개의 짧은 클릭 소리로 기계적 효과
+                    for (let i = 0; i < 20; i++) {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        // 주파수가 점점 낮아지는 효과 (속도가 줄어드는 느낌)
+                        const frequency = 200 + (100 * (20 - i) / 20);
+                        oscillator.frequency.setValueAtTime(frequency, now + i * 0.1);
+                        oscillator.type = 'square';
+                        
+                        // 짧은 클릭 소리
+                        gainNode.gain.setValueAtTime(0, now + i * 0.1);
+                        gainNode.gain.linearRampToValueAtTime(0.1, now + i * 0.1 + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.05);
+                        
+                        oscillator.start(now + i * 0.1);
+                        oscillator.stop(now + i * 0.1 + 0.05);
+                    }
+                };
+                
+                // 두 소리 동시 재생
+                createSpinSound();
+                createMechanicalSound();
+                
+            } catch (error) {
+                console.log('회전 효과음을 재생할 수 없습니다:', error);
+            }
         }
 
         function playWinnerSound() {
@@ -1532,10 +2217,10 @@
 
         function loadPracticeFile() {
             const practiceNames = [
-                '이미숙', '장유리', '김혜영', '황보주희', '이창재', '이선희', '김효정(4학년)', '이윤희',
+                '이미숙', '장유리', '김혜영', '황보주희', '이창재', '이선희', '김효정', '이윤희',
                 '석중순', '김진경', 'Sett Wong Carmen', '김종현', '서효숙', '김소정', '신선혜', '최정미',
-                '황금이', '권헌숙', '조승우', '이소미', '김효정(3, 4학년)', '손정순', '이정화', '이한라',
-                '박지선', '권혜민', '김민아', '최미경', '권기태'
+                '황금이', '권헌숙', '조승우', '이소미', '손정순', '이정화', '이한라', '박지선',
+                '권혜민', '김민아', '최미경', '권기태'
             ];
             
             participants = [...practiceNames];
@@ -1587,11 +2272,11 @@
             if (loadBtn && previousSettings && previousSettings.participants && previousSettings.participants.length >= 2) {
                 loadBtn.disabled = false;
                 loadBtn.title = `이전 설정 불러오기 (${previousSettings.participants.length}명, ${previousSettings.timestamp})`;
-                loadBtn.textContent = `📋 불러오기 (${previousSettings.participants.length}명)`;
+                loadBtn.textContent = `📋 이전 참가자 (${previousSettings.participants.length}명)`;
             } else if (loadBtn) {
                 loadBtn.disabled = true;
                 loadBtn.title = '이전 설정이 없습니다';
-                loadBtn.textContent = '📋 불러오기';
+                loadBtn.textContent = '📋 이전 참가자';
             }
         }
 
@@ -1620,6 +2305,35 @@
                 }
             } catch (error) {
                 console.log('저장된 설정 불러오기 실패:', error);
+            }
+        }
+
+        // 음성 발표 설정 불러오기
+        function loadVoiceSettings() {
+            try {
+                const saved = localStorage.getItem('voiceAnnouncementEnabled');
+                if (saved !== null) {
+                    voiceAnnouncementEnabled = saved === 'true';
+                    console.log('음성 설정 불러옴:', voiceAnnouncementEnabled);
+                } else {
+                    voiceAnnouncementEnabled = true; // 기본값: 켜짐
+                    console.log('음성 설정 기본값 사용: 켜짐');
+                }
+                
+                // UI 업데이트
+                const btn = document.getElementById('voiceToggle');
+                const toggleText = btn.querySelector('.toggle-text');
+                
+                if (voiceAnnouncementEnabled) {
+                    btn.classList.add('active');
+                    toggleText.textContent = '켜짐';
+                } else {
+                    btn.classList.remove('active');
+                    toggleText.textContent = '꺼짐';
+                }
+            } catch (error) {
+                console.log('음성 설정 불러오기 실패:', error);
+                voiceAnnouncementEnabled = true; // 오류 시 기본값
             }
         }
 
@@ -1757,10 +2471,11 @@
         // 초기화
         initializeParticipants(); // 먼저 기본 참가자 초기화
         loadSavedSettings(); // 그 다음 저장된 설정 확인하여 불러오기 버튼 활성화
+        loadVoiceSettings(); // 음성 발표 설정 불러오기
         
         // 초기 버튼 텍스트 설정
         document.getElementById('colorScheme').innerHTML = colorSchemes[colorSchemeIndex].name + ' <span class="click-indicator">▶</span>';
         document.getElementById('colorScheme').classList.add('rainbow');
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98961c3bc72e5141',t:'MTc1OTU5NTkxNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'989a981835f43268',t:'MTc1OTY0MjkzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
